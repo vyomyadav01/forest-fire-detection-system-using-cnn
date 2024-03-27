@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('https://s.hdnux.com/photos/75/41/60/16129074/13/rawImage.jpg');
+            /* Replace with your chosen image URL */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            color: #fff;
+            /* Change text color to white for better contrast */
+        }
+
+        h1,
+        #prediction-result {
+            color: #fff;
+            /* Change heading color to white for better contrast */
+            text-shadow: 2px 2px 4px #000;
+            /* Add text shadow for better readability */
+        }
+
+        h1 {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 32px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .top-right {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .top-right button {
+            cursor: pointer;
+            background-color: #008cba;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-transform: uppercase;
+            border-radius: 5px;
+            font-size: 16px;
+            box-shadow: 2px 2px 4px #000;
+            /* Add shadow to button for better visibility */
+            margin-left: 10px; /* Add margin between buttons */
+        }
+
+        .top-right button:hover {
+            background-color: #005f73;
+        }
+
+        form {
+            margin-bottom: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            /* Add semi-transparent background to form */
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        #prediction-result {
+            font-size: 24px;
+            margin-top: 15px;
+        }
+
+        #image-preview {
+            max-width: 300px;
+            margin-top: 15px;
+        }
+
+        button {
+            cursor: pointer;
+            background-color: #008cba;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-transform: uppercase;
+            border-radius: 5px;
+            font-size: 16px;
+            box-shadow: 2px 2px 4px #000;
+            /* Add shadow to button for better visibility */
+        }
+
+        button:hover {
+            background-color: #005f73;
+        }
+
+        input[type="file"] {
+            margin-top: 10px;
+        }
+
+        /* Logout button style */
+        #logout-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            cursor: pointer;
+            background-color: #008cba;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-transform: uppercase;
+            border-radius: 5px;
+            font-size: 16px;
+            box-shadow: 2px 2px 4px #000;
+        }
+
+        #logout-button:hover {
+            background-color: #005f73;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="top-right">
+        <button onclick="location.href='/about'">About</button>
+        <button onclick="location.href='/services'">Services</button>
+    </div>
+    <h1>Forest fire prediction system</h1>
+    <form id="upload-form" action="/predict" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" id="file-input" required>
+        <button type="submit">Predict</button>
+    </form>
+    <div id="image-preview"></div>
+    <div id="prediction-result"></div>
+
+    <!-- Logout button -->
+    <button id="logout-button" onclick="location.href='/logout'">Logout</button>
+
+    <script>
+        document.getElementById('upload-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const imagePreview = document.getElementById('image-preview');
+            const predictionResult = document.getElementById('prediction-result');
+            const fileInput = document.getElementById('file-input');
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                imagePreview.innerHTML = '<img src="' + e.target.result + '" alt="Uploaded Image" style="max-width: 100%; height: auto;" />';
+            };
+            reader.readAsDataURL(file);
+
+            fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    predictionResult.textContent = 'Prediction: ' + data.prediction;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+    </script>
+</body>
+
+</html>
